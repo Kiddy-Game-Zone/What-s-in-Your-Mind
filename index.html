@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's in Your Mind? (Word Predictor)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Base Styles & CSS Variables --- */
+        :root {
+            /* Default Theme (Playful Teal/Orange) */
+            --bg-color: #E6FFFA; /* teal-50 */
+            --main-container-bg: #ffffff;
+            --main-container-border: #2C5282; /* blue-800 */
+            --main-container-shadow: #2C5282;
+            --step-card-bg: #FFF5EB; /* orange-50 */
+            --step-card-border: #FBD38D; /* orange-300 */
+            --step-card-shadow: #F6AD55; /* orange-400 */
+            --choice-bg: #B2F5EA; /* teal-200 */
+            --choice-border: #4FD1C5; /* teal-300 */
+            --choice-text: #234E52; /* teal-900 */
+            --choice-hover-bg: #81E6D9; /* teal-300 */
+            --choice-selected-bg: #38B2AC; /* teal-500 */
+            --choice-selected-border: #2C7A7B; /* teal-700 */
+            --choice-selected-text: #E6FFFA; /* teal-50 */
+            --action-button-text: white;
+            --action-button-border: #2C5282; /* blue-800 */
+            --action-button-shadow: #2C5282;
+            --action-button-hover-shadow: #2A4365; /* blue-900 */
+            --action-button-active-shadow: #2C5282;
+            --predict-button-bg: #DD6B20; /* orange-600 */
+            --predict-button-hover-bg: #C05621; /* orange-700 */
+            --predict-button-active-bg: #9C4221; /* orange-800 */
+            --reset-button-bg: #4299E1; /* blue-500 */
+            --reset-button-hover-bg: #3182CE; /* blue-600 */
+            --reset-button-active-bg: #2B6CB0; /* blue-700 */
+            --result-area-bg: #FFF5EB; /* orange-50 */
+            --result-area-border: #FBD38D; /* orange-300 */
+            --result-area-shadow: #F6AD55; /* orange-400 */
+            --result-text-color: #9C4221; /* orange-800 */
+            --predicted-word-text: #C05621; /* orange-700 */
+            --thinking-text-color: #B7791F; /* yellow-800 */
+            --heading-color: #2C5282; /* blue-800 */
+            --subheading-color: #DD6B20; /* orange-600 */
+            --step-heading-color: #718096; /* gray-600 */
+            --label-color: #DD6B20;
+            --footer-text-color: #718096; /* gray-600 */
+            --focus-ring-color: var(--predict-button-bg);
+            --theme-selector-bg: #FFF5EB;
+            --theme-selector-border: #FBD38D;
+            --theme-selector-text: #DD6B20;
+        }
+
+        /* --- Theme Definitions (Same as before) --- */
+        body[data-theme="ocean-blue"] { --bg-color: #E0F2FE; --main-container-bg: #ffffff; --main-container-border: #075985; --main-container-shadow: #075985; --step-card-bg: #CFFAFE; --step-card-border: #67E8F9; --step-card-shadow: #22D3EE; --choice-bg: #A5F3FC; --choice-border: #67E8F9; --choice-text: #155E75; --choice-hover-bg: #67E8F9; --choice-selected-bg: #22D3EE; --choice-selected-border: #0E7490; --choice-selected-text: #164E63; --action-button-border: #075985; --action-button-shadow: #075985; --action-button-hover-shadow: #075985; --action-button-active-shadow: #075985; --predict-button-bg: #38BDF8; --predict-button-hover-bg: #0EA5E9; --predict-button-active-bg: #0284C7; --reset-button-bg: #2DD4BF; --reset-button-hover-bg: #14B8A6; --reset-button-active-bg: #0D9488; --result-area-bg: #A5F3FC; --result-area-border: #67E8F9; --result-area-shadow: #22D3EE; --result-text-color: #164E63; --predicted-word-text: #083344; --thinking-text-color: #155E75; --heading-color: #0C4A6E; --subheading-color: #155E75; --step-heading-color: #0369A1; --label-color: #155E75; --footer-text-color: #0369A1; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #A5F3FC; --theme-selector-border: #67E8F9; --theme-selector-text: #155E75; }
+        body[data-theme="forest-green"] { --bg-color: #ECFDF5; --main-container-bg: #ffffff; --main-container-border: #064E3B; --main-container-shadow: #064E3B; --step-card-bg: #D1FAE5; --step-card-border: #6EE7B7; --step-card-shadow: #34D399; --choice-bg: #A7F3D0; --choice-border: #6EE7B7; --choice-text: #065F46; --choice-hover-bg: #6EE7B7; --choice-selected-bg: #34D399; --choice-selected-border: #059669; --choice-selected-text: #064E3B; --action-button-border: #064E3B; --action-button-shadow: #064E3B; --action-button-hover-shadow: #064E3B; --action-button-active-shadow: #064E3B; --predict-button-bg: #A3E635; --predict-button-hover-bg: #84CC16; --predict-button-active-bg: #65A30D; --reset-button-bg: #4ADE80; --reset-button-hover-bg: #22C55E; --reset-button-active-bg: #16A34A; --result-area-bg: #A7F3D0; --result-area-border: #6EE7B7; --result-area-shadow: #34D399; --result-text-color: #047857; --predicted-word-text: #064E3B; --thinking-text-color: #065F46; --heading-color: #065F46; --subheading-color: #065F46; --step-heading-color: #047857; --label-color: #065F46; --footer-text-color: #047857; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #A7F3D0; --theme-selector-border: #6EE7B7; --theme-selector-text: #065F46; }
+        body[data-theme="cosmic-purple"] { --bg-color: #F5F3FF; --main-container-bg: #1E1B4B; --main-container-border: #A78BFA; --main-container-shadow: #A78BFA; --step-card-bg: #3730A3; --step-card-border: #C4B5FD; --step-card-shadow: #A78BFA; --choice-bg: #4338CA; --choice-border: #A78BFA; --choice-text: #EEF2FF; --choice-hover-bg: #5B21B6; --choice-selected-bg: #7C3AED; --choice-selected-border: #C4B5FD; --choice-selected-text: #F5F3FF; --action-button-text: #1E1B4B; --action-button-border: #A78BFA; --action-button-shadow: #A78BFA; --action-button-hover-shadow: #A78BFA; --action-button-active-shadow: #A78BFA; --predict-button-bg: #F472B6; --predict-button-hover-bg: #EC4899; --predict-button-active-bg: #DB2777; --reset-button-bg: #A78BFA; --reset-button-hover-bg: #8B5CF6; --reset-button-active-bg: #7C3AED; --result-area-bg: #4338CA; --result-area-border: #A78BFA; --result-area-shadow: #A78BFA; --result-text-color: #C4B5FD; --predicted-word-text: #EDE9FE; --thinking-text-color: #A78BFA; --heading-color: #EDE9FE; --subheading-color: #C4B5FD; --step-heading-color: #DDD6FE; --label-color: #C4B5FD; --footer-text-color: #A78BFA; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #4338CA; --theme-selector-border: #A78BFA; --theme-selector-text: #EEF2FF; }
+        body[data-theme="sunny-yellow"] { --bg-color: #FEF9C3; --main-container-bg: #ffffff; --main-container-border: #CA8A04; --main-container-shadow: #CA8A04; --step-card-bg: #FEF08A; --step-card-border: #FACC15; --step-card-shadow: #EAB308; --choice-bg: #FEF3C7; --choice-border: #FDE047; --choice-text: #854D0E; --choice-hover-bg: #FDE047; --choice-selected-bg: #FACC15; --choice-selected-border: #CA8A04; --choice-selected-text: #78350F; --action-button-border: #CA8A04; --action-button-shadow: #CA8A04; --action-button-hover-shadow: #CA8A04; --action-button-active-shadow: #CA8A04; --predict-button-bg: #FB923C; --predict-button-hover-bg: #F97316; --predict-button-active-bg: #EA580C; --reset-button-bg: #FACC15; --reset-button-hover-bg: #EAB308; --reset-button-active-bg: #CA8A04; --result-area-bg: #FEF3C7; --result-area-border: #FDE047; --result-area-shadow: #EAB308; --result-text-color: #854D0E; --predicted-word-text: #713F12; --thinking-text-color: #A16207; --heading-color: #B45309; --subheading-color: #A16207; --step-heading-color: #B45309; --label-color: #A16207; --footer-text-color: #B45309; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #FEF3C7; --theme-selector-border: #FDE047; --theme-selector-text: #854D0E; }
+        body[data-theme="candy-pink"] { --bg-color: #FDF2F8; --main-container-bg: #ffffff; --main-container-border: #9D174D; --main-container-shadow: #9D174D; --step-card-bg: #FCE7F3; --step-card-border: #F9A8D4; --step-card-shadow: #F472B6; --choice-bg: #FBCFE8; --choice-border: #F9A8D4; --choice-text: #9D174D; --choice-hover-bg: #F9A8D4; --choice-selected-bg: #F472B6; --choice-selected-border: #DB2777; --choice-selected-text: #831843; --action-button-border: #9D174D; --action-button-shadow: #9D174D; --action-button-hover-shadow: #9D174D; --action-button-active-shadow: #9D174D; --predict-button-bg: #A78BFA; --predict-button-hover-bg: #8B5CF6; --predict-button-active-bg: #7C3AED; --reset-button-bg: #F472B6; --reset-button-hover-bg: #EC4899; --reset-button-active-bg: #DB2777; --result-area-bg: #FBCFE8; --result-area-border: #F9A8D4; --result-area-shadow: #F472B6; --result-text-color: #9D174D; --predicted-word-text: #831843; --thinking-text-color: #BE185D; --heading-color: #831843; --subheading-color: #BE185D; --step-heading-color: #DB2777; --label-color: #BE185D; --footer-text-color: #9D174D; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #FBCFE8; --theme-selector-border: #F9A8D4; --theme-selector-text: #9D174D; }
+        body[data-theme="night-mode"] { --bg-color: #111827; --main-container-bg: #1F2937; --main-container-border: #6B7280; --main-container-shadow: #9CA3AF; --step-card-bg: #374151; --step-card-border: #9CA3AF; --step-card-shadow: #D1D5DB; --choice-bg: #4B5563; --choice-border: #9CA3AF; --choice-text: #F9FAFB; --choice-hover-bg: #52525b; --choice-selected-bg: #6B7280; --choice-selected-border: #D1D5DB; --choice-selected-text: #F9FAFB; --action-button-text: #111827; --action-button-border: #9CA3AF; --action-button-shadow: #9CA3AF; --action-button-hover-shadow: #D1D5DB; --action-button-active-shadow: #6B7280; --predict-button-bg: #60A5FA; --predict-button-hover-bg: #3B82F6; --predict-button-active-bg: #2563EB; --reset-button-bg: #34D399; --reset-button-hover-bg: #10B981; --reset-button-active-bg: #059669; --result-area-bg: #4B5563; --result-area-border: #9CA3AF; --result-area-shadow: #D1D5DB; --result-text-color: #ECFDF5; --predicted-word-text: #f0fdf4; --thinking-text-color: #D1D5DB; --heading-color: #F9FAFB; --subheading-color: #E5E7EB; --step-heading-color: #D1D5DB; --label-color: #E5E7EB; --footer-text-color: #9CA3AF; --focus-ring-color: var(--predict-button-bg); --theme-selector-bg: #4B5563; --theme-selector-border: #9CA3AF; --theme-selector-text: #F9FAFB; }
+
+        /* --- General Styles --- */
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding-top: 5rem; /* Space for theme selector */
+            position: relative;
+            transition: background-color 0.3s ease;
+            overflow-x: hidden;
+        }
+        main { flex-grow: 1; }
+
+        .main-container {
+            background-color: var(--main-container-bg);
+            border: 3px solid var(--main-container-border);
+            border-radius: 20px;
+            box-shadow: 8px 8px 0px var(--main-container-shadow);
+            width: 100%;
+            max-width: 48rem; /* Adjusted width */
+            margin: 2rem auto 1rem auto; /* Default margin */
+            padding: 1.5rem sm:p-8;
+            text-align: center;
+            flex-shrink: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Step Card Styling */
+        .step-card {
+            background-color: var(--step-card-bg);
+            border: 2px solid var(--step-card-border);
+            border-radius: 16px;
+            box-shadow: 4px 4px 0px var(--step-card-shadow);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .step-heading {
+            font-size: 1rem; /* Slightly larger step heading */
+            font-weight: 600;
+            color: var(--step-heading-color);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px dashed var(--step-card-border);
+        }
+
+        /* Choice Button Styling - Updated */
+        .choices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Increased min width */
+            gap: 1rem;
+            justify-items: center;
+        }
+        .choice-button {
+            background-color: var(--choice-bg);
+            color: var(--choice-text);
+            border: 2px solid var(--choice-border);
+            border-radius: 12px;
+            padding: 0.6rem 0.8rem; /* Adjusted padding */
+            font-weight: 600;
+            font-size: 0.85rem; /* Slightly smaller text */
+            cursor: pointer;
+            transition: all 0.2s ease-out;
+            width: 100%;
+            max-width: 180px;
+            display: flex; /* Use flex */
+            align-items: center; /* Vertically center items */
+            justify-content: center; /* Horizontally center items */
+            gap: 0.4rem; /* Space between emoji and text */
+            box-shadow: 3px 3px 0px var(--choice-border);
+            min-height: 55px; /* Adjusted min height */
+            text-align: center;
+            line-height: 1.3; /* Adjust line height for text */
+        }
+        .choice-button:hover {
+            background-color: var(--choice-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0px var(--choice-border);
+        }
+        .choice-button.selected {
+            background-color: var(--choice-selected-bg);
+            border-color: var(--choice-selected-border);
+            color: var(--choice-selected-text);
+            box-shadow: 2px 2px 0px var(--choice-selected-border);
+            transform: translateY(1px);
+        }
+        .choice-button span { /* Emoji span */
+            font-size: 1.4rem; /* Slightly smaller emoji */
+            display: inline-block; /* Ensure it behaves well with flex */
+            line-height: 1; /* Prevent extra space */
+            flex-shrink: 0; /* Prevent emoji from shrinking */
+        }
+        .choice-button .text-content { /* Added wrapper for text if needed */
+             flex-grow: 1; /* Allow text to take remaining space if needed */
+             text-align: center;
+        }
+
+
+        /* Action Button Styles */
+        .action-button {
+            color: var(--action-button-text); font-weight: 700; padding: 0.8rem 1.8rem; border-radius: 1rem; border: 3px solid var(--action-button-border); box-shadow: 5px 5px 0px var(--action-button-shadow); transition: all 0.15s ease-out; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-size: 1rem; min-width: 120px; transform-style: preserve-3d;
+        }
+        .action-button:hover { box-shadow: 6px 6px 0px var(--action-button-hover-shadow); transform: translateY(-3px) translateX(-2px) translateZ(5px); }
+        .action-button:active { box-shadow: 2px 2px 0px var(--action-button-active-shadow); transform: translateY(2px) translateX(2px) translateZ(0px); }
+        .action-button:focus { outline: none; box-shadow: 5px 5px 0px var(--action-button-shadow), 0 0 0 3px var(--bg-color), 0 0 0 5px var(--focus-ring-color); }
+        .action-button:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: 5px 5px 0px var(--action-button-shadow); transform: none; }
+
+        #predictBtn { background-color: var(--predict-button-bg); border-color: var(--action-button-border); box-shadow: 5px 5px 0px var(--action-button-shadow); --focus-ring-color: var(--predict-button-bg); }
+        #predictBtn:hover:not(:disabled) { background-color: var(--predict-button-hover-bg); box-shadow: 6px 6px 0px var(--action-button-hover-shadow); }
+        #predictBtn:active:not(:disabled) { background-color: var(--predict-button-active-bg); box-shadow: 2px 2px 0px var(--action-button-active-shadow); }
+
+        #resetBtn { background-color: var(--reset-button-bg); border-color: var(--action-button-border); box-shadow: 5px 5px 0px var(--action-button-shadow); --focus-ring-color: var(--reset-button-bg); }
+        #resetBtn:hover { background-color: var(--reset-button-hover-bg); box-shadow: 6px 6px 0px var(--action-button-hover-shadow); }
+        #resetBtn:active { background-color: var(--reset-button-active-bg); box-shadow: 2px 2px 0px var(--action-button-active-shadow); }
+
+
+        /* Result Area Styles */
+        #resultArea {
+            background-color: var(--result-area-bg); border: 2px dashed var(--result-area-border); border-radius: 16px; box-shadow: 4px 4px 0px var(--result-area-shadow); padding: 1.5rem; margin-top: 2rem; min-height: 150px; text-align: center; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; opacity: 0; transform: scale(0.9) rotate(-2deg); display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        #resultArea.visible { opacity: 1; transform: scale(1) rotate(0deg); animation: reveal 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
+        #resultText { font-size: 1.3rem; font-weight: 600; color: var(--result-text-color); margin-bottom: 0.5rem; transition: color 0.3s ease; line-height: 1.4; }
+        #predictedWord { font-size: 1.8rem; font-weight: 700; margin: 0.5rem 0 1rem 0; padding: 0.5rem 1rem; border-radius: 8px; display: inline-block; color: var(--predicted-word-text); background-color: rgba(255, 255, 255, 0.3); }
+        #thinkingText { font-style: italic; color: var(--thinking-text-color); transition: color 0.3s ease; font-size: 1.1rem; margin-bottom: 1rem; }
+
+        /* Headings & Labels */
+        .main-heading { color: var(--heading-color); transition: color 0.3s ease; padding-top: 1rem; /* Default padding */ }
+        .sub-heading { color: var(--subheading-color); transition: color 0.3s ease; font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; }
+
+        /* Footer Styling */
+        .page-footer { text-align: center; padding: 1rem 0; margin-top: 1rem; font-size: 0.8rem; color: var(--footer-text-color); flex-shrink: 0; line-height: 1.5; transition: color 0.3s ease; }
+        .page-footer p { margin-bottom: 0.25rem; }
+
+        /* Theme Selector Styles */
+        .theme-selector-container { position: absolute; top: 1rem; right: 1rem; z-index: 10; }
+        .theme-selector-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+        #themeSelector { padding: 0.4rem 0.8rem; border-radius: 8px; border: 2px solid var(--theme-selector-border); background-color: var(--theme-selector-bg); color: var(--theme-selector-text); font-weight: 500; cursor: pointer; box-shadow: 2px 2px 0px var(--theme-selector-border); transition: all 0.2s ease; vertical-align: middle; font-size: 0.8rem; }
+        #themeSelector:focus { outline: none; box-shadow: 2px 2px 0px var(--theme-selector-border), 0 0 0 3px var(--main-container-bg), 0 0 0 5px var(--theme-selector-border); }
+
+        /* Dark Theme Adjustments */
+        body[data-theme="cosmic-purple"] .main-heading svg,
+        body[data-theme="night-mode"] .main-heading svg { color: #F687B3; /* pink-400 */ }
+        body[data-theme="cosmic-purple"] .sub-heading,
+        body[data-theme="night-mode"] .sub-heading { color: #D1D5DB; }
+        body[data-theme="cosmic-purple"] #themeSelector:focus,
+        body[data-theme="night-mode"] #themeSelector:focus { box-shadow: 2px 2px 0px var(--theme-selector-border), 0 0 0 3px var(--main-container-bg), 0 0 0 5px var(--theme-selector-border); }
+        body[data-theme="cosmic-purple"] #predictedWord,
+        body[data-theme="night-mode"] #predictedWord { background-color: rgba(0, 0, 0, 0.2); color: #FFF; }
+
+
+        /* Hide class utility */
+        .hidden { display: none; }
+
+        /* Animation for result reveal */
+        @keyframes reveal { from { transform: scale(0.8) rotate(-5deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <div class="theme-selector-container">
+        <label for="themeSelector" class="theme-selector-label">Choose a Theme:</label>
+        <select id="themeSelector">
+            <option value="default">🎨 Default</option>
+            <option value="ocean-blue">🌊 Ocean Blue</option>
+            <option value="forest-green">🌲 Forest Green</option>
+            <option value="cosmic-purple">✨ Cosmic Purple</option>
+            <option value="sunny-yellow">☀️ Sunny Yellow</option>
+            <option value="candy-pink">🍬 Candy Pink</option>
+            <option value="night-mode">🌙 Night Mode</option>
+        </select>
+    </div>
+
+    <main>
+        <div class="main-container">
+            <h1 class="main-heading text-3xl sm:text-4xl font-bold text-center mb-4 tracking-tight flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-9 h-9 text-orange-600">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L1.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.624L16.5 21.75l-.398-1.126a3.375 3.375 0 00-2.455-2.456L12.75 18l1.126-.398a3.375 3.375 0 002.455-2.456L16.5 14.25l.398 1.126a3.375 3.375 0 002.456 2.456L20.25 18l-1.126.398a3.375 3.375 0 00-2.456 2.456z" />
+                </svg>
+                 What's in Your Mind? <span class="text-2xl">❓</span>
+            </h1>
+
+            <p class="sub-heading text-center mb-8">Think of a common word (like 'apple' 🍎, 'dog' 🐶, 'car' 🚗). Answer the questions below, and I'll try to guess what kind of word it is!</p>
+
+            <div id="gameArea">
+                <div class="step-card">
+                    <h2 class="step-heading">Step 1: What kind of thing is it?</h2>
+                    <div class="choices-grid" id="typeChoices">
+                        <button class="choice-button" data-value="living"><span>🐶</span>Living Thing</button>
+                        <button class="choice-button" data-value="made"><span>🔧</span>Man-Made</button>
+                        <button class="choice-button" data-value="natural"><span>🌳</span>Natural (Non-Living)</button>
+                        <button class="choice-button" data-value="place"><span>🏞️</span>A Place</button>
+                        <button class="choice-button" data-value="concept"><span>💡</span>Idea/Concept</button>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <h2 class="step-heading">Step 2: Where is it usually found?</h2>
+                    <div class="choices-grid" id="locationChoices">
+                        <button class="choice-button" data-value="indoors"><span>🏠</span>Mainly Indoors</button>
+                        <button class="choice-button" data-value="outdoors"><span>🌲</span>Mainly Outdoors</button>
+                        <button class="choice-button" data-value="both"><span>🌍</span>Both/Anywhere</button>
+                        <button class="choice-button" data-value="water"><span>💧</span>In/Near Water</button>
+                        <button class="choice-button" data-value="sky"><span>☁️</span>In the Sky</button>
+                        <button class="choice-button" data-value="digital"><span>💻</span>On a Screen/Digital</button>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <h2 class="step-heading">Step 3: How big is it usually?</h2>
+                    <div class="choices-grid" id="sizeChoices">
+                        <button class="choice-button" data-value="tiny"><span>🤏</span>Tiny (Insect/Grain)</button>
+                        <button class="choice-button" data-value="small"><span>🖐️</span>Handheld/Small</button>
+                        <button class="choice-button" data-value="medium"><span>🧍</span>Person-Sized</button>
+                        <button class="choice-button" data-value="large"><span>🚗</span>Car-Sized/Large</button>
+                        <button class="choice-button" data-value="huge"><span>🏢</span>Huge (Building+)</button>
+                    </div>
+                </div>
+
+                 <div class="step-card">
+                    <h2 class="step-heading">Step 4: How do you mainly interact with it?</h2>
+                    <div class="choices-grid" id="interactionChoices">
+                        <button class="choice-button" data-value="eat"><span>😋</span>Eat/Drink it</button>
+                        <button class="choice-button" data-value="use"><span>🛠️</span>Use/Play with it</button>
+                        <button class="choice-button" data-value="wear"><span>👕</span>Wear it</button>
+                        <button class="choice-button" data-value="observe"><span>👀</span>Look at/Experience it</button>
+                        <button class="choice-button" data-value="care"><span>❤️</span>Care for it</button>
+                        <button class="choice-button" data-value="read_write"><span>✍️</span>Read/Write it</button>
+                    </div>
+                </div>
+
+                <button id="predictBtn" class="action-button mt-6" disabled>🔮 Guess My Word Type!</button>
+            </div>
+
+            <div id="resultArea" class="hidden">
+                <p id="thinkingText">🧠 Thinking really hard...</p>
+                <p id="resultText"></p>
+                <div id="predictedWord" class="hidden">CATEGORY</div>
+                <button id="resetBtn" class="action-button mt-4">Play Again? 🔁</button>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>© 2025 ToolForge. All rights reserved.</p>
+        <p>Built with ❤️ by Anas.</p>
+    </footer>
+
+    <script>
+        // --- DOM Elements ---
+        const gameArea = document.getElementById('gameArea');
+        const resultArea = document.getElementById('resultArea');
+        const thinkingText = document.getElementById('thinkingText');
+        const resultText = document.getElementById('resultText');
+        const predictedWordDiv = document.getElementById('predictedWord');
+        const predictBtn = document.getElementById('predictBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const themeSelector = document.getElementById('themeSelector');
+        const choiceContainers = {
+            type: document.getElementById('typeChoices'),
+            location: document.getElementById('locationChoices'),
+            size: document.getElementById('sizeChoices'),
+            interaction: document.getElementById('interactionChoices')
+        };
+
+        // --- Game State ---
+        const userChoices = {
+            type: null,
+            location: null,
+            size: null,
+            interaction: null
+        };
+
+        // --- Functions ---
+
+        /** Checks if all choices have been made and enables/disables the predict button. */
+        function checkIfReadyToPredict() {
+            const allChosen = Object.values(userChoices).every(choice => choice !== null);
+            predictBtn.disabled = !allChosen;
+        }
+
+        /** Handles clicks on choice buttons, updates state, and styles. */
+        function handleChoiceClick(event) {
+            const button = event.target.closest('.choice-button');
+            if (!button) return;
+            const category = button.parentElement.id.replace('Choices', '');
+            const value = button.dataset.value;
+            userChoices[category] = value;
+
+            const buttonsInCategory = choiceContainers[category].querySelectorAll('.choice-button');
+            buttonsInCategory.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.value === value) btn.classList.add('selected');
+            });
+            checkIfReadyToPredict();
+        }
+
+        /** Simple pattern-matching logic to predict word category. */
+        function predictWordCategory() {
+            const { type, location, size, interaction } = userChoices;
+
+            // Define prediction rules based on combinations (more rules can be added)
+            if (interaction === 'eat') return "a type of Food or Drink 🍕🥤?";
+            if (interaction === 'care' && type === 'living') return "an Animal or Pet 🐶🐈?";
+            if (interaction === 'wear' && type === 'made') return "an item of Clothing 👕👖?";
+            if (interaction === 'read_write' && type === 'made') return "something written like a Book or Letter 📚✍️?";
+            if (interaction === 'read_write' && type === 'concept') return "a Number or Letter 🔢🅰️?";
+
+            if (type === 'living') {
+                if (size === 'tiny') return "an Insect or tiny creature 🐞?";
+                if (size === 'huge' || size === 'large') return "a large Animal or Plant 🐘🌳?";
+                return "an Animal or Plant 🐾🌱?";
+            }
+            if (type === 'made') {
+                if (size === 'large' || size === 'huge') return "a Vehicle or large Structure 🚗🏢?";
+                if (interaction === 'use' && location === 'indoors') return "a piece of Furniture or Appliance 🛋️?";
+                if (interaction === 'use') return "a Tool or Toy 🔧🧸?";
+                return "a Man-Made Object 🏭?";
+            }
+             if (type === 'natural') {
+                if (size === 'huge') return "a large Natural Feature like a Mountain ⛰️?";
+                if (location === 'sky') return "something in the Sky like a Cloud or Star ☁️⭐?";
+                if (location === 'water') return "Water or something found in it 💧?";
+                return "a Natural Object like a Rock or Flower 🪨🌸?";
+            }
+            if (type === 'place') {
+                if (location === 'indoors') return "a Room or Building 🏠?";
+                if (location === 'outdoors') return "an Outdoor Place like a Park or Beach 🏞️🏖️?";
+                return "a Place or Location 🗺️?";
+            }
+             if (type === 'concept') {
+                if (interaction === 'observe') return "a Concept like Time or a Color ⏳🎨?";
+                return "an Idea, Feeling, or Concept 🤔💡?";
+            }
+
+            // Default fallback
+            return "something interesting 🤔?";
+        }
+
+
+        /** Runs the prediction process. */
+        function runPrediction() {
+            if (predictBtn.disabled) return;
+
+            gameArea.classList.add('hidden');
+            resultArea.classList.remove('hidden');
+            resultText.textContent = '';
+            predictedWordDiv.classList.add('hidden');
+            thinkingText.textContent = '🧠 Analyzing clues...';
+            thinkingText.style.display = 'block';
+            resultArea.classList.remove('visible');
+
+            setTimeout(() => thinkingText.textContent = '💡 Connecting the dots...', 1000);
+
+            setTimeout(() => {
+                const prediction = predictWordCategory();
+                thinkingText.style.display = 'none';
+                resultText.textContent = "Based on your answers, maybe you're thinking of...";
+                predictedWordDiv.textContent = prediction;
+                predictedWordDiv.classList.remove('hidden');
+                resultArea.classList.add('visible');
+            }, 2500);
+        }
+
+        /** Resets the game to its initial state. */
+        function resetGame() {
+            Object.keys(userChoices).forEach(category => {
+                userChoices[category] = null;
+                const buttons = choiceContainers[category].querySelectorAll('.choice-button');
+                buttons.forEach(btn => btn.classList.remove('selected'));
+            });
+            predictBtn.disabled = true;
+            resultArea.classList.add('hidden');
+            resultArea.classList.remove('visible');
+            predictedWordDiv.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+        }
+
+        // --- Theme Switching Logic (No localStorage) ---
+        function applyTheme(themeName) {
+            document.body.dataset.theme = themeName;
+        }
+
+        function loadInitialTheme() {
+            const initialTheme = themeSelector.value || 'default';
+            applyTheme(initialTheme);
+        }
+
+        themeSelector.addEventListener('change', (event) => {
+            applyTheme(event.target.value);
+        });
+
+
+        // --- Event Listeners ---
+        Object.values(choiceContainers).forEach(container => {
+            container.addEventListener('click', handleChoiceClick);
+        });
+        predictBtn.addEventListener('click', runPrediction);
+        resetBtn.addEventListener('click', resetGame);
+
+        // --- Initial Load ---
+        loadInitialTheme(); // Apply default theme
+        resetGame(); // Initialize game state
+
+    </script>
+
+</body>
+</html>
